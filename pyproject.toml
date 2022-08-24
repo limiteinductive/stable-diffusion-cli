@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "sdc"
+version = "0.1.0"
+description = ""
+authors = [ "limiteinductive <benjamintrom@gmail.com>"]
+readme = "README.md"
+dependencies = {python = "^3.9", typer = {extras = [ "all"], version = "^0.6.1"}, diffusers = "^0.2.4"}
+
+[build-system]
+requires = [ "relaxed-poetry-core>=0.1.2"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+poetry = 'sdc.cli:main'
