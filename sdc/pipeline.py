@@ -144,8 +144,9 @@ def run_stable_diffusion(
     if isinstance(scheduler, LMSDiscreteScheduler):
         latents = latents * scheduler.sigmas[0]
 
-    for i, t in tqdm(enumerate(scheduler.timesteps[t_start:])):
-        with load_from_plasma(plasma.unet, device=device) as unet:
+    with load_from_plasma(plasma.unet, device=device) as unet:
+        for i, t in tqdm(enumerate(scheduler.timesteps[t_start:])):
+        
             latent_model_input = torch.cat([latents] * 2)
             if isinstance(scheduler, LMSDiscreteScheduler):
                 latent_model_input = latent_model_input / ((scheduler.sigmas[i] ** 2 + 1) ** 0.5)
