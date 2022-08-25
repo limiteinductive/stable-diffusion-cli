@@ -14,7 +14,8 @@ from sdc.utils import load_from_plasma, numpy_to_pil, performance, push_model_to
 if sys.version_info >= (3, 8):
     from typing import List, TypedDict, Union
 else:
-    from typing_extensions import List, TypedDict, Union
+    from typing_extensions import TypedDict
+    from typing import List, Union
 
 
 @dataclass
