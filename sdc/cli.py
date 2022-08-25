@@ -15,7 +15,7 @@ def main():
         default="A Swirling Colorful Galaxy, Intricate Detailed Color Smashing, Particles, Technologic, Ice, Broken Mirror, Fluid Acrilic, Thin Fractal Tendrils, Elegant, Ornametrical, Ruan Jia, Wlop. Scifi, Fantasy, Hyper Detailed, Octane Render, Concept Art, By Peter Mohrbacher",
     )
 
-    batch_size = Prompt.ask(":sushi: How many images", default=1)
+    batch_size = Prompt.ask(":sushi: How many images", default="1")
 
     checkpoint_path = Path.home() / ".cache/stable-diffusion/"
     checkpoint_path.mkdir(exist_ok=True)
@@ -27,5 +27,6 @@ def main():
     output_path = Path("./outputs")
     output_path.mkdir(exist_ok=True)
     for i, image in enumerate(output["sample"]):
-        image.save(output_path / f"{str(i).zfill(4)}.png")
+        number_existing_images = len(list(output_path.glob("*.png")))
+        image.save(output_path / f"{str(i + number_existing_images).zfill(4)}.png")
 
