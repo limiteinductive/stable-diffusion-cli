@@ -10,6 +10,7 @@ from PIL import Image
 from ray import ObjectRef
 from torchvision.transforms.functional import to_tensor
 from tqdm import tqdm
+from transformers import CLIPFeatureExtractor, PreTrainedTokenizer
 
 from sdc.utils import load_from_plasma, numpy_to_pil, performance, push_model_to_plasma, seed_everything
 
@@ -20,23 +21,25 @@ class StableDiffusionPlasma:
     text_encoder: ObjectRef
     unet: ObjectRef
     safety_checker: ObjectRef
+    feature_extractor: CLIPFeatureExtractor
+    tokenizer: PreTrainedTokenizer
 
 
-def initialize_plasma(checkpoint_path="./models/") -> StableDiffusionPlasma:
+def initialize_plasma(checkpoint_path="./stable-diffusion.pt") -> StableDiffusionPlasma:
     """
     Initialize the plasma with the checkpoint.
     """
     plasma = {}
-    path = Path(checkpoint_path)
+    model_dict = torch.load(checkpoint_path)
 
-    for field in fields(StableDiffusionPlasma):
-        model = torch.load(path / f"{field.name}.pt")
-        plasma[field.name] = push_model_to_plasma(model)
+    for field, model in model_dict.items():
+        plasma[field] = push_model_to_plasma(model) if isinstance(model, torch.nn.Module) else model
 
     return StableDiffusionPlasma(**plasma)
 
 
-def process_image(image: strerror):
+def process_image(image: Union[str, Image.Image]) -> torch.Tensor:
+    init_image = Image.open(init_image).convert("RGB") if isinstance(init_image, str) else init_image
     w, h = image.size
     w, h = map(lambda x: x - x % 32, (w, h))  # resize to integer multiple of 32
     image = image.resize((w, h), resample=Image.LANCZOS)
@@ -72,7 +75,6 @@ def run_stable_diffusion(
     Run the stable diffusion pipeline.
     """
     seed = seed_everything(seed)
-    print("Seed: ", seed)
 
     if plasma is None:
         plasma = initialize_plasma(checkpoint_path=checkpoint_path)
@@ -92,15 +94,14 @@ def run_stable_diffusion(
 
     width, height = map(lambda x: (x // 8) * 8, (width, height))
 
-    tokenizer = torch.load(Path(checkpoint_path) / "tokenizer.pt")
-    text_input = tokenizer(
+    text_input = plasma.tokenizer(
         [prompt] * batch_size,
         padding="max_length",
-        max_length=tokenizer.model_max_length,
+        max_length=plasma.tokenizer.model_max_length,
         truncation=True,
         return_tensors="pt",
     )
-    uncond_input = tokenizer(
+    uncond_input = plasma.tokenizer(
         [""] * batch_size,
         padding="max_length",
         max_length=text_input.input_ids.shape[-1],
@@ -144,7 +145,6 @@ def run_stable_diffusion(
 
     for i, t in tqdm(enumerate(scheduler.timesteps[t_start:])):
         with load_from_plasma(plasma.unet, device=device) as unet:
-
             latent_model_input = torch.cat([latents] * 2)
             if isinstance(scheduler, LMSDiscreteScheduler):
                 latent_model_input = latent_model_input / ((scheduler.sigmas[i] ** 2 + 1) ** 0.5)
@@ -166,8 +166,7 @@ def run_stable_diffusion(
         pil_images = numpy_to_pil(images)
 
     with load_from_plasma(plasma.safety_checker, device=device) as safety_checker:
-        feature_extractor = torch.load(Path(checkpoint_path) / "feature_extractor.pt")
-        safety_checker_input = feature_extractor(pil_images, return_tensors="pt").to(device)
+        safety_checker_input = plasma.feature_extractor(pil_images, return_tensors="pt").to(device)
         output_images, has_nsfw_concept = safety_checker(clip_input=safety_checker_input.pixel_values, images=images)
 
     return {
@@ -179,11 +178,11 @@ def run_stable_diffusion(
 
 if __name__ == "__main__":
     output = run_stable_diffusion(
-        prompt="cute dog",
+        prompt="san goku",
         init_image="outputs/5.png",
-        skip_steps=0.3,
+        skip_steps=0.35,
         device="cuda:2",
-        checkpoint_path="/home/selas/laiogen/stable-diffusion-cli/models",
+        checkpoint_path="/home/selas/laiogen/stable-diffusion.pt",
         batch_size=1,
     )
 
