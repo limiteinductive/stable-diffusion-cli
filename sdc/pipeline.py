@@ -122,7 +122,7 @@ def run_stable_diffusion(
     t_start = int(steps - skip_timestep)
 
     if init_image:
-        init_image = Image.open(init_image).convert("RGB")
+        init_image = Image.open(init_image).convert("RGB") if isinstance(init_image, str) else init_image
         init_image = init_image.resize((width, height))
         init_image = process_image(init_image)
 
