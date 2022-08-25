@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, TypedDict, Union
+if sys.version_info >= (3, 8):
+    from typing import List, TypedDict, Union
+else:
+    from typing_extensions import List, TypedDict, Union
 
 import numpy as np
 import torch
