@@ -39,7 +39,7 @@ def initialize_plasma(checkpoint_path="./stable-diffusion.pt") -> StableDiffusio
 
 
 def process_image(image: Union[str, Image.Image]) -> torch.Tensor:
-    init_image = Image.open(init_image).convert("RGB") if isinstance(init_image, str) else init_image
+    image = Image.open(image).convert("RGB") if isinstance(image, str) else image
     w, h = image.size
     w, h = map(lambda x: x - x % 32, (w, h))  # resize to integer multiple of 32
     image = image.resize((w, h), resample=Image.LANCZOS)
