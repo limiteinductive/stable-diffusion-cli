@@ -1,18 +1,16 @@
-from dataclasses import dataclass, fields
-from os import strerror
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple, TypedDict, Union
+from typing import List, TypedDict, Union
 
 import numpy as np
 import torch
 from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMScheduler
 from PIL import Image
 from ray import ObjectRef
-from torchvision.transforms.functional import to_tensor
 from tqdm import tqdm
 from transformers import CLIPFeatureExtractor, PreTrainedTokenizer
 
-from sdc.utils import load_from_plasma, numpy_to_pil, performance, push_model_to_plasma, seed_everything
+from sdc.utils import load_from_plasma, numpy_to_pil, performance, push_model_to_plasma, seed_everything, to_tensor
 
 
 @dataclass
