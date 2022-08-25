@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+import sys
 if sys.version_info >= (3, 8):
     from typing import List, TypedDict, Union
 else:
