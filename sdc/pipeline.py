@@ -180,9 +180,7 @@ def run_stable_diffusion(
 
 if __name__ == "__main__":
     output = run_stable_diffusion(
-        prompt="san goku",
-        init_image="outputs/5.png",
-        skip_steps=0.35,
+        prompt=" a swirling colorful galaxy, intricate detailed color smashing, particles, technologic, ice, broken mirror, fluid acrilic, thin fractal tendrils, elegant, ornametrical, ruan jia, wlop. scifi, fantasy, hyper detailed, octane render, concept art, by peter mohrbacher",
         device="cuda:2",
         checkpoint_path="/home/selas/laiogen/stable-diffusion.pt",
         batch_size=1,
