@@ -81,6 +81,7 @@ def run_stable_diffusion(
 
     if scheduler is None:
         scheduler = LMSDiscreteScheduler(beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear")
+        offset=0
         scheduler.set_timesteps(steps)
         if init_image:
             scheduler = PNDMScheduler(
