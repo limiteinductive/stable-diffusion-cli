@@ -1,11 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
 import sys
-if sys.version_info >= (3, 8):
-    from typing import List, TypedDict, Union
-else:
-    from typing_extensions import List, TypedDict, Union
-
 import numpy as np
 import torch
 from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMScheduler
@@ -15,6 +10,11 @@ from tqdm import tqdm
 from transformers import CLIPFeatureExtractor, PreTrainedTokenizer
 
 from sdc.utils import load_from_plasma, numpy_to_pil, performance, push_model_to_plasma, seed_everything, to_tensor
+
+if sys.version_info >= (3, 8):
+    from typing import List, TypedDict, Union
+else:
+    from typing_extensions import List, TypedDict, Union
 
 
 @dataclass
