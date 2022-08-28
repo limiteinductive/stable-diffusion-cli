@@ -1,0 +1,1 @@
+from sdc.pipeline import run_stable_diffusion

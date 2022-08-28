@@ -73,6 +73,7 @@ def run_stable_diffusion(
     device: str = "cuda",
     plasma: StableDiffusionPlasma = None,
     checkpoint_path="./models/",
+    verbose=True
 ) -> StableDiffusionOutput:
     """
     Run the stable diffusion pipeline.
@@ -147,8 +148,14 @@ def run_stable_diffusion(
     if isinstance(scheduler, LMSDiscreteScheduler):
         latents = latents * scheduler.sigmas[0]
 
+
+    steps_range = enumerate(scheduler.timesteps[t_start:])
+    if verbose:
+        steps_range = tqdm(steps_range)
+
+
     with load_from_plasma(plasma.unet, device=device) as unet:
-        for i, t in tqdm(enumerate(scheduler.timesteps[t_start:])):
+        for i, t in steps_range:
         
             latent_model_input = torch.cat([latents] * 2)
             if isinstance(scheduler, LMSDiscreteScheduler):
